@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "DoOnce",
+  "version": "0.1.0",
+  "description": "Teach once. Run forever. Fix itself.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAre5T410XGTmJ1ovSAkit5aD89zM5HVHgJPeod3VogTb8BhhHGbZMUNWW/tBn7deMa+7xUWTi9dAHOgsTUOuO4meY0D4lYw8LGexdvWIXr/mvV5ukIVjGwD7mMjHS0JbRpt3fBJHGnQtcHJhc+h5XapjFjc5PMqCWTYW7swc6J+hr9pN1EPRcgjq0/AQGZi9NP+BeLSSuTiGJ0nBFt2qKxITI7ksBJp/CF5njWRBUq5UgrPtWUV8Y/x/U+fzm71SBMcyNbuy813tOEzOsfqOFCBTk9FHBZ7y8GSeMo51sHbW1RTQyUk//O5tuBBaEHn8yMasZWUQ7fTPlBVTuMwhx6wIDAQAB",
+  "permissions": ["nativeMessaging", "tabs", "scripting", "downloads", "sidePanel", "webNavigation", "storage"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open DoOnce",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  }
+}

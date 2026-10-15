@@ -1,0 +1,23 @@
+[package]
+name = "doonce-engine"
+description = "Deterministic replay engine and Chrome DevTools driver for DoOnce"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+doonce-core.workspace = true
+dirs.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+tokio-util.workspace = true
+
+[dev-dependencies]
+doonce-cli = { path = "../doonce-cli" }
+tempfile.workspace = true

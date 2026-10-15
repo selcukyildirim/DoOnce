@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Reports · Acme Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header><strong>Acme Portal</strong>
+    <nav><a href="index.html">Home</a><a href="contact.html">Contacts</a><a href="reports.html">Reports</a><a href="account.html">Account</a></nav>
+  </header>
+  <main>
+    <h1>Reports</h1>
+    <section class="card" aria-label="Report options">
+      <div class="grid">
+        <div>
+          <label for="report-date">Report date</label>
+          <input type="date" id="report-date" name="reportDate">
+        </div>
+        <div>
+          <label for="region">Region</label>
+          <select id="region" name="region">
+            <option value="all">All regions</option>
+            <option value="emea">EMEA</option>
+            <option value="americas">Americas</option>
+            <option value="apac">APAC</option>
+          </select>
+        </div>
+      </div>
+      <div id="generate-slot"></div>
+    </section>
+    <div id="status" class="banner ok hidden"></div>
+    <div class="grid" id="cards"></div>
+  </main>
+  <script>
+    const variant = window.demoVariant;
+    const DATA = [
+      { region: "emea", product: "Widget", sold: 120, stock: 40 },
+      { region: "emea", product: "Gadget", sold: 75, stock: 12 },
+      { region: "americas", product: "Widget", sold: 210, stock: 65 },
+      { region: "apac", product: "Gizmo", sold: 98, stock: 30 },
+    ];
+
+    const generate = variant === "classic"
+      ? `<button id="generate" class="generate-report">Generate Report</button>`
+      : variant === "redesign"
+        ? `<button class="btn-run" data-role="run">Generate Report</button>`
+        : `<button class="btn-run" data-action="build-report">Build report</button>`;
+    document.getElementById("generate-slot").innerHTML = generate;
+
+    function exportButton(kind) {
+      if (variant === "classic") return `<button id="export-${kind}" class="export-report">Export CSV</button>`;
+      if (variant === "redesign") return `<button class="btn-dl" data-kind="${kind}">Export CSV</button>`;
+      return `<button class="btn-dl" data-action="download-csv" data-kind="${kind}">Download CSV</button>`;
+    }
+
+    function rows(kind) {
+      const date = document.getElementById("report-date").value;
+      const region = document.getElementById("region").value;
+      return DATA.filter((d) => region === "all" || d.region === region)
+        .map((d) => [date, d.region, d.product, kind === "sales" ? d.sold : d.stock]);
+    }
+
+    function render() {
+      const cards = document.getElementById("cards");
+      cards.innerHTML = ["sales", "inventory"].map((kind) => `
+        <section class="card">
+          <h2>${kind === "sales" ? "Sales report" : "Inventory report"}</h2>
+          <table><tbody>${rows(kind).map((r) => `<tr><td>${r.slice(1).join("</td><td>")}</td></tr>`).join("")}</tbody></table>
+          ${exportButton(kind)}
+        </section>`).join("");
+      cards.querySelectorAll("button").forEach((b, i) => b.addEventListener("click", () => download(i === 0 ? "sales" : "inventory")));
+    }
+
+    function download(kind) {
+      const date = document.getElementById("report-date").value || "undated";
+      const region = document.getElementById("region").value;
+      const csv = ["date,region,product," + (kind === "sales" ? "sold" : "stock"), ...rows(kind).map((r) => r.join(","))].join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+      a.download = `${kind}-${date}-${region}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    document.querySelector("#generate-slot button").addEventListener("click", () => {
+      const date = document.getElementById("report-date").value;
+      const status = document.getElementById("status");
+      if (!date) {
+        status.className = "banner error";
+        status.textContent = "Please choose a report date.";
+        return;
+      }
+      // Simulates a slow server so replay has to wait for the result.
+      status.className = "banner ok";
+      status.textContent = "Generating…";
+      setTimeout(() => {
+        status.textContent = `Report ready for ${date}`;
+        render();
+      }, 600);
+    });
+  </script>
+</body>
+</html>

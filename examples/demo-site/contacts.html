@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Contacts · Acme Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header><strong>Acme Portal</strong>
+    <nav><a href="index.html">Home</a><a href="contact.html">Contacts</a><a href="reports.html">Reports</a><a href="account.html">Account</a></nav>
+  </header>
+  <main>
+    <h1>Contacts</h1>
+    <div id="saved" class="banner ok hidden"></div>
+    <section class="card">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Country</th><th>Plan</th><th>Newsletter</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <a class="button" href="contact.html">Add another</a>
+    </section>
+  </main>
+  <script>
+    const savedName = new URLSearchParams(location.search).get("saved");
+    if (savedName) {
+      const b = document.getElementById("saved");
+      b.textContent = "Contact saved: " + savedName;
+      b.classList.remove("hidden");
+    }
+    const rows = document.getElementById("rows");
+    for (const c of store("contacts", [])) {
+      const tr = document.createElement("tr");
+      for (const v of [c.name, c.email, c.country, c.plan, c.newsletter ? "yes" : "no"]) {
+        const td = document.createElement("td");
+        td.textContent = v;
+        tr.appendChild(td);
+      }
+      rows.appendChild(tr);
+    }
+  </script>
+</body>
+</html>

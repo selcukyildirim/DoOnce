@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "name": "Demo contact (classic)",
+  "parameters": [],
+  "steps": [
+    {
+      "id": "step-1",
+      "type": "navigate",
+      "url": "http://127.0.0.1:4317/contact.html?variant=classic"
+    },
+    {
+      "id": "step-2",
+      "type": "fill",
+      "target": { "role": "textbox", "name": "Full name", "selectors": ["#full-name"] },
+      "value": "Ada Lovelace"
+    },
+    {
+      "id": "step-3",
+      "type": "fill",
+      "target": { "role": "textbox", "name": "Email", "selectors": ["#email"] },
+      "value": "ada@example.com"
+    },
+    {
+      "id": "step-4",
+      "type": "select",
+      "target": { "role": "combobox", "name": "Country", "selectors": ["#country"] },
+      "value": "tr"
+    },
+    {
+      "id": "step-5",
+      "type": "check",
+      "target": { "role": "checkbox", "name": "Send me the newsletter", "selectors": ["#newsletter"] },
+      "checked": true
+    },
+    {
+      "id": "step-6",
+      "type": "click",
+      "target": { "role": "button", "name": "Save contact", "selectors": ["#save-contact"] }
+    },
+    {
+      "id": "step-7",
+      "type": "assert",
+      "condition": { "textContains": "Contact saved" }
+    }
+  ]
+}

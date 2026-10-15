@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Account · Acme Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header><strong>Acme Portal</strong>
+    <nav><a href="index.html">Home</a><a href="contact.html">Contacts</a><a href="reports.html">Reports</a><a href="account.html">Account</a></nav>
+  </header>
+  <main>
+    <h1>Account</h1>
+    <div id="result" class="banner ok hidden"></div>
+    <section class="card">
+      <h2>Preferences</h2>
+      <label class="inline"><input type="checkbox" id="dark-mode"> Dark mode</label>
+      <br><button class="secondary" id="save-prefs" onclick="showResult('Preferences saved')">Save preferences</button>
+    </section>
+    <section class="card danger-zone" aria-label="Danger zone">
+      <h2>Danger zone</h2>
+      <p>Deleting the account removes all contacts. This cannot be undone.</p>
+      <button id="delete-account" onclick="localStorage.removeItem('contacts'); showResult('Account deleted')">Delete account</button>
+    </section>
+  </main>
+  <script>
+    function showResult(text) {
+      const r = document.getElementById("result");
+      r.textContent = text;
+      r.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>

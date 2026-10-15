@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New contact · Acme Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js"></script>
+</head>
+<body>
+  <header><strong>Acme Portal</strong>
+    <nav><a href="index.html">Home</a><a href="contact.html">Contacts</a><a href="reports.html">Reports</a><a href="account.html">Account</a></nav>
+  </header>
+  <main>
+    <h1>New contact</h1>
+    <div id="error" class="banner error hidden"></div>
+    <form id="contact-form" class="card" aria-label="New contact" novalidate>
+      <label for="full-name">Full name</label>
+      <input type="text" id="full-name" name="fullName" autocomplete="off">
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" autocomplete="off">
+
+      <label for="country">Country</label>
+      <select id="country" name="country">
+        <option value="">Choose…</option>
+        <option value="tr">Türkiye</option>
+        <option value="de">Germany</option>
+        <option value="us">United States</option>
+      </select>
+
+      <label>Plan</label>
+      <label class="inline"><input type="radio" name="plan" value="free" checked> Free</label>
+      <label class="inline"><input type="radio" name="plan" value="pro"> Pro</label>
+
+      <label class="inline" style="margin-top:14px"><input type="checkbox" id="newsletter" name="newsletter"> Send me the newsletter</label>
+
+      <label for="portal-password">Portal password</label>
+      <input type="password" id="portal-password" name="portalPassword" autocomplete="new-password">
+
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes"></textarea>
+
+      <div id="actions"></div>
+    </form>
+  </main>
+  <script>
+    const variant = window.demoVariant;
+    // The redesign changes ids and classes but keeps the visible text.
+    document.getElementById("actions").innerHTML = variant === "classic"
+      ? `<button type="submit" id="save-contact" class="primary">Save contact</button>`
+      : variant === "redesign"
+        ? `<div class="toolbar"><button type="submit" class="btn btn-primary-2" data-role="submit">Save contact</button></div>`
+        : `<div class="toolbar"><button type="submit" class="btn btn-primary-2" data-action="store">Create contact</button></div>`;
+
+    document.getElementById("contact-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const f = e.target;
+      const error = document.getElementById("error");
+      if (!f.fullName.value.trim() || !f.email.value.includes("@")) {
+        error.textContent = "Please enter a name and a valid email.";
+        error.classList.remove("hidden");
+        return;
+      }
+      const contacts = store("contacts", []);
+      contacts.push({
+        name: f.fullName.value.trim(), email: f.email.value, country: f.country.value,
+        plan: f.plan.value, newsletter: f.newsletter.checked, hasPassword: f.portalPassword.value.length > 0,
+        notes: f.notes.value,
+      });
+      save("contacts", contacts);
+      location.href = "contacts.html?saved=" + encodeURIComponent(f.fullName.value.trim());
+    });
+  </script>
+</body>
+</html>

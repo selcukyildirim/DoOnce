@@ -25,7 +25,7 @@ anyhow = "1"
 axum = { version = "0.8", features = ["json", "macros"] }
 argon2 = { version = "0.5", features = ["std"] }
 aes-gcm = "0.10"
-base64 = "0.22"
+base64 = "0.23"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.10"
 clap = { version = "4", features = ["derive", "env"] }

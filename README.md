@@ -8,6 +8,8 @@ hybrid SaaS, with tenant isolation, RBAC, SSO and tamper-evident audit logs.
 
 - Apache-2.0 licensed. AGPL-licensed projects are used only as a behavioral
   reference; no code is copied.
+
+![DoOnce Demo](docs/demo.gif)
 - Targets SOC 2 Type II, ISO 27001, GDPR, KVKK, HIPAA and PCI-DSS. Cardholder
   data is never stored; PHI requires an isolated data plane.
 
@@ -325,6 +327,8 @@ izolasyonu, RBAC, SSO ve değiştirilemez denetim (audit) günlükleri içerir.
 
 - Apache-2.0 lisanslı. AGPL lisanslı projeler yalnızca davranış/özellik referansı
   olarak kullanılır; kod kopyalanmaz.
+
+![DoOnce Demo](docs/demo.gif)
 - SOC 2 Type II, ISO 27001, GDPR, KVKK, HIPAA ve PCI-DSS hedeflenir. Kart
   verisi asla saklanmaz; PHI için izole veri düzlemi gerekir.
 

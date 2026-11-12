@@ -61,7 +61,7 @@ tokio-tungstenite = "0.27"
 tokio-util = { version = "0.7", features = ["rt"] }
 tower = { version = "0.5", features = ["util", "limit"] }
 tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip", "fs", "request-id", "set-header", "timeout"] }
-zip = { version = "8", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
 tokio = { version = "1", features = [
     "rt-multi-thread",
     "macros",

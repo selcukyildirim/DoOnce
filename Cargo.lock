@@ -1261,7 +1261,7 @@ dependencies = [
  "doonce-services",
  "doonce-store",
  "hex",
- "hmac 0.12.1",
+ "hmac 0.13.0",
  "reqwest",
  "serde_json",
  "sha2 0.10.9",

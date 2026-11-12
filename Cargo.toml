@@ -33,7 +33,7 @@ dirs = "6"
 futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
 hex = "0.4"
 rand = "0.8"
-jsonschema = "0.26"
+jsonschema = "0.61"
 jsonlogic = "0.5"
 boa_engine = "0.20"
 csv = "1"

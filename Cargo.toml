@@ -57,7 +57,7 @@ sqlx = { version = "0.8", default-features = false, features = [
 tempfile = "3"
 thiserror = "2"
 totp-rs = { version = "5", features = ["otpauth", "gen_secret"] }
-tokio-tungstenite = "0.27"
+tokio-tungstenite = "0.30"
 tokio-util = { version = "0.7", features = ["rt"] }
 tower = { version = "0.5", features = ["util", "limit"] }
 tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip", "fs", "request-id", "set-header", "timeout"] }

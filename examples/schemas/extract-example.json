@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "title": { "type": "string", "description": "Page or item title" },
+    "points": { "type": "integer", "description": "Score/points if present" }
+  },
+  "required": ["title"]
+}

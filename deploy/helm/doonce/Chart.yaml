@@ -1,0 +1,7 @@
+apiVersion: v2
+name: doonce
+description: DoOnce Enterprise browser automation control plane and worker
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+license: Apache-2.0

@@ -1,0 +1,17 @@
+DoOnce is installing in {{ .Values.deploymentMode }} mode (region {{ .Values.region }}).
+
+1. Create the runtime secret before rollout if it does not exist:
+
+   kubectl -n {{ .Release.Namespace }} create secret generic {{ .Values.existingSecret }} \
+     --from-literal=DOONCE_DATABASE_URL='postgres://user:pass@host:5432/doonce' \
+     --from-literal=DOONCE_MASTER_KEY='<base64 32-byte key>'
+
+2. If connector.enabled=true, also create {{ .Values.connector.existingSecret }}
+   with keys DOONCE_CONNECTOR_TOKEN and DOONCE_CONNECTOR_LOCAL_API_KEY.
+
+3. Port-forward the API:
+
+   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "doonce.fullname" . }} 8080:{{ .Values.service.port }}
+
+4. Open http://127.0.0.1:8080 and bootstrap the first API key with
+   `doonce quickstart` against the same database, or provision through your IdP.

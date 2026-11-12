@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "doonce.fullname" . }}-config
+  labels:
+    {{- include "doonce.labels" . | nindent 4 }}
+data:
+  DOONCE_DEPLOYMENT_MODE: {{ .Values.deploymentMode | quote }}
+  DOONCE_REGION: {{ .Values.region | quote }}
+  DOONCE_ARTIFACT_DIR: /data/artifacts
+  {{- range $key, $value := .Values.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}

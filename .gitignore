@@ -1,0 +1,34 @@
+/target/
+/target-*/
+**/*.rs.bk
+
+# Local runtime data
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+master.key
+admin.key
+.env
+.env.*
+!.env.example
+
+# Node / web / SDK
+node_modules/
+dist/
+.vite/
+coverage/
+__pycache__/
+*.pyc
+*.egg-info/
+*.tsbuildinfo
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

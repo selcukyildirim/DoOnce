@@ -1,0 +1,32 @@
+[package]
+name = "doonce-worker"
+description = "DoOnce background worker: workflow/task queue, scheduler and webhooks"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+doonce-agent.workspace = true
+doonce-browser.workspace = true
+doonce-core.workspace = true
+doonce-engine.workspace = true
+doonce-llm.workspace = true
+doonce-security.workspace = true
+doonce-services.workspace = true
+doonce-store.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+hex.workspace = true
+hmac.workspace = true
+reqwest.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "2.0",
+  "name": "Google search smoke test",
+  "description": "Open a Google search results page and wait for the results to render.",
+  "blocks": [
+    {
+      "id": "open",
+      "type": "browserAction",
+      "action": {
+        "kind": "navigate",
+        "url": "https://www.google.com/search?q=best+rust+web+framework&hl=en"
+      },
+      "next": "results"
+    },
+    {
+      "id": "results",
+      "type": "wait",
+      "condition": { "urlContains": "google.com/search" },
+      "next": "done"
+    },
+    {
+      "id": "done",
+      "type": "terminate",
+      "status": "completed"
+    }
+  ]
+}

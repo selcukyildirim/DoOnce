@@ -1,0 +1,163 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  web:
+    name: build web console
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist
+
+  binary:
+    name: binary ${{ matrix.target }}
+    needs: web
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-15-intel
+          - target: aarch64-apple-darwin
+            os: macos-14
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist
+      - uses: houseabsolute/actions-rust-cross@v1
+        with:
+          command: build
+          target: ${{ matrix.target }}
+          args: --release -p doonce-cli
+      - name: Package
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          NAME="doonce-${GITHUB_REF_NAME}-${TARGET}"
+          mkdir -p "dist/$NAME"
+          BIN="doonce"
+          if [[ "$TARGET" == *windows* ]]; then BIN="doonce.exe"; fi
+          cp "target/${TARGET}/release/$BIN" "dist/$NAME/"
+          cp -R web/dist "dist/$NAME/web"
+          cp -R deploy "dist/$NAME/deploy"
+          cp -R docs "dist/$NAME/docs"
+          cp -R examples "dist/$NAME/examples"
+          cp README.md SECURITY.md CONTRIBUTING.md LICENSE CHANGELOG.md .env.example "dist/$NAME/"
+          tar -czf "dist/$NAME.tar.gz" -C dist "$NAME"
+          python3 - <<'PY'
+          import hashlib, pathlib
+          for path in pathlib.Path("dist").glob("*.tar.gz"):
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              pathlib.Path(str(path) + ".sha256").write_text(f"{digest}  {path.name}\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.target }}
+          path: dist/*.tar.gz*
+
+  sbom:
+    name: source SBOM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: doonce-source.spdx.json
+          upload-artifact: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-sbom
+          path: doonce-source.spdx.json
+
+  docker:
+    name: container image
+    needs: web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: web/dist
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}:latest
+          provenance: mode=max
+          sbom: true
+      - uses: sigstore/cosign-installer@v3
+      - name: Sign image
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: cosign sign --yes "ghcr.io/${{ github.repository }}@${DIGEST}"
+
+  github-release:
+    name: publish release
+    needs: [binary, sbom, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: release-*
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: source-sbom
+          path: sbom
+      - name: Merge checksums
+        run: |
+          cd artifacts
+          cat ./*.tar.gz.sha256 | sort > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/*.tar.gz
+            artifacts/SHA256SUMS
+            sbom/doonce-source.spdx.json

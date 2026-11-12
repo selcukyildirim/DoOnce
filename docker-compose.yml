@@ -1,0 +1,90 @@
+name: doonce
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: doonce
+      POSTGRES_USER: doonce
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes:
+      - doonce-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U doonce -d doonce"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    build: .
+    image: doonce:local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DOONCE_DATABASE_URL: postgres://doonce:${POSTGRES_PASSWORD:-change-me}@postgres:5432/doonce
+      DOONCE_BIND: 0.0.0.0:8080
+      DOONCE_UI_DIR: /app/web
+      DOONCE_HOME: /data
+      DOONCE_ARTIFACT_DIR: /data/artifacts
+      DOONCE_DEPLOYMENT_MODE: ${DOONCE_DEPLOYMENT_MODE:-onprem}
+      DOONCE_REGION: ${DOONCE_REGION:-global}
+    ports:
+      - "8080:8080"
+    volumes:
+      - doonce-data:/data
+    restart: unless-stopped
+
+  worker:
+    image: doonce:local
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DOONCE_DATABASE_URL: postgres://doonce:${POSTGRES_PASSWORD:-change-me}@postgres:5432/doonce
+      DOONCE_HOME: /data
+      DOONCE_ARTIFACT_DIR: /data/artifacts
+      DOONCE_DEPLOYMENT_MODE: ${DOONCE_DEPLOYMENT_MODE:-onprem}
+      DOONCE_REGION: ${DOONCE_REGION:-global}
+    command: ["worker"]
+    volumes:
+      - doonce-data:/data
+    restart: unless-stopped
+
+  connector:
+    image: doonce:local
+    profiles: ["hybrid"]
+    depends_on:
+      local-api:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DOONCE_DEPLOYMENT_MODE: ${DOONCE_DEPLOYMENT_MODE:-onprem}
+      DOONCE_REGION: ${DOONCE_REGION:-global}
+      DOONCE_CONTROL_URL: ${DOONCE_CONTROL_URL:-http://127.0.0.1:8080}
+      DOONCE_CONNECTOR_LOCAL_URL: ${DOONCE_CONNECTOR_LOCAL_URL:-http://local-api:8080}
+      DOONCE_CONNECTOR_LOCAL_API_KEY: ${DOONCE_CONNECTOR_LOCAL_API_KEY:-}
+      DOONCE_CONNECTOR_TOKEN: ${DOONCE_CONNECTOR_TOKEN:-}
+    command: ["connector"]
+    restart: unless-stopped
+
+  local-api:
+    image: doonce:local
+    profiles: ["hybrid"]
+    env_file: .env
+    environment:
+      DOONCE_DATABASE_URL: sqlite:///data/doonce.db?mode=rwc
+      DOONCE_HOME: /data
+      DOONCE_ARTIFACT_DIR: /data/artifacts
+      DOONCE_BIND: 0.0.0.0:8080
+    volumes:
+      - doonce-local:/data
+    restart: unless-stopped
+
+volumes:
+  doonce-postgres:
+  doonce-data:
+  doonce-local:

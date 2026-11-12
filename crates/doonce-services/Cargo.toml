@@ -1,0 +1,29 @@
+[package]
+name = "doonce-services"
+description = "Concrete service implementations for the DoOnce block engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+doonce-agent.workspace = true
+doonce-browser.workspace = true
+doonce-core.workspace = true
+doonce-engine.workspace = true
+doonce-llm.workspace = true
+doonce-security.workspace = true
+doonce-store.workspace = true
+futures-util.workspace = true
+lettre.workspace = true
+reqwest.workspace = true
+url.workspace = true
+mime_guess.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+totp-rs.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

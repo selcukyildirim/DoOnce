@@ -1,0 +1,64 @@
+{{- if .Values.connector.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "doonce.fullname" . }}-connector
+  labels:
+    {{- include "doonce.labels" . | nindent 4 }}
+    app.kubernetes.io/component: connector
+spec:
+  replicas: {{ .Values.connector.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "doonce.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: connector
+  template:
+    metadata:
+      labels:
+        {{- include "doonce.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: connector
+    spec:
+      serviceAccountName: {{ include "doonce.fullname" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: connector
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["connector"]
+          args:
+            - "--control-url"
+            - {{ .Values.connector.controlUrl | quote }}
+            - "--local-url"
+            - {{ .Values.connector.localUrl | quote }}
+            - "--poll-secs"
+            - {{ .Values.connector.pollSecs | quote }}
+            - "--lease-secs"
+            - {{ .Values.connector.leaseSecs | quote }}
+            {{- if .Values.connector.autoApprove }}
+            - "--auto-approve"
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "doonce.fullname" . }}-config
+            - secretRef:
+                name: {{ .Values.connector.existingSecret }}
+          env:
+            - name: DOONCE_HOME
+              value: /data
+          resources:
+            {{- toYaml .Values.resources.api | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "doonce.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}

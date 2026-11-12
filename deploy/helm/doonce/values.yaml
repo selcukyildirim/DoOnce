@@ -1,0 +1,92 @@
+image:
+  repository: ghcr.io/doonce/doonce
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+api:
+  replicaCount: 1
+  bind: 0.0.0.0:8080
+
+worker:
+  replicaCount: 1
+  concurrency: 2
+  autoApprove: false
+
+connector:
+  enabled: false
+  replicaCount: 1
+  controlUrl: https://doonce.example.com
+  localUrl: http://127.0.0.1:8080
+  pollSecs: 2
+  leaseSecs: 900
+  autoApprove: false
+  # Existing secret keys: DOONCE_CONNECTOR_TOKEN, DOONCE_CONNECTOR_LOCAL_API_KEY
+  existingSecret: doonce-connector
+
+deploymentMode: onprem
+region: global
+
+# Existing secret keys: DOONCE_DATABASE_URL, DOONCE_MASTER_KEY
+existingSecret: doonce-secrets
+
+env:
+  DOONCE_LOG: info
+  DOONCE_TELEMETRY: "false"
+  DOONCE_HEADLESS: "true"
+
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: doonce.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  api:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  worker:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

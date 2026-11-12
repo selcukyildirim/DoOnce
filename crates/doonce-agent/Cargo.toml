@@ -1,0 +1,25 @@
+[package]
+name = "doonce-agent"
+description = "Natural-language browser task agent with vision for DoOnce"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+doonce-browser.workspace = true
+doonce-core.workspace = true
+doonce-engine.workspace = true
+doonce-llm.workspace = true
+jsonschema.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+futures-util.workspace = true
+tempfile.workspace = true

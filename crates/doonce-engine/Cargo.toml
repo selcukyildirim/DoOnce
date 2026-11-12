@@ -1,0 +1,25 @@
+[package]
+name = "doonce-engine"
+description = "Deterministic block executor for DoOnce workflows"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+doonce-browser.workspace = true
+doonce-core.workspace = true
+boa_engine.workspace = true
+csv.workspace = true
+futures-util.workspace = true
+jsonlogic.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

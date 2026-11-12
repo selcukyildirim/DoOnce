@@ -1,0 +1,104 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: rust (fmt, clippy, test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Test
+        run: cargo test --workspace
+
+  supply-chain:
+    name: supply chain (audit, deny)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: RustSec audit
+        uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: License and dependency policy
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+
+  web:
+    name: web console
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  sdk:
+    name: sdk (python, typescript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python SDK tests
+        working-directory: sdk/python
+        run: python -m unittest discover -s tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: TypeScript SDK build and tests
+        working-directory: sdk/typescript
+        run: |
+          npm install
+          npm test
+
+  deploy:
+    name: deployment assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+      - name: Helm lint
+        run: helm lint deploy/helm/doonce
+      - name: Compose config
+        run: |
+          cp .env.example .env
+          docker compose config -q
+          rm -f .env
+      - name: Dockerfile check
+        run: DOCKER_BUILDKIT=1 docker build --check .
+      - name: Shell script syntax
+        run: |
+          bash -n deploy/scripts/build-airgap-bundle.sh
+          bash -n deploy/docker/entrypoint.sh

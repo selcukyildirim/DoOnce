@@ -1,0 +1,26 @@
+[Unit]
+Description=DoOnce browser worker
+After=network-online.target doonce.service
+Wants=network-online.target
+Requires=doonce.service
+
+[Service]
+Type=simple
+User=doonce
+Group=doonce
+EnvironmentFile=/etc/doonce/doonce.env
+ExecStart=/usr/local/bin/doonce worker
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/doonce
+CapabilityBoundingSet=
+AmbientCapabilities=
+LimitNOFILE=65535
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

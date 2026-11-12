@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doonce-sdk"
+version = "0.1.0"
+description = "Python client for the DoOnce Enterprise browser automation API"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "DoOnce" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/doonce/doonce"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["doonce*"]
